@@ -64,17 +64,17 @@ namespace midi轉換器Csh
         #region 載入
         private void onmidi_Click(object sender, EventArgs e)
         {
-            oF1.InitialDirectory = Application.StartupPath;
-            if (oF1.ShowDialog() == DialogResult.OK)
+            openMidiDialog.InitialDirectory = Application.StartupPath;
+            if (openMidiDialog.ShowDialog() == DialogResult.OK)
             {
-                using (BinaryReader read = new BinaryReader(File.Open(oF1.FileName, FileMode.Open), Encoding.UTF8))
+                using (BinaryReader read = new BinaryReader(File.Open(openMidiDialog.FileName, FileMode.Open), Encoding.UTF8))
                 {
-                    FileInfo info1 = new FileInfo(oF1.FileName);
+                    FileInfo info1 = new FileInfo(openMidiDialog.FileName);
                     byte[] data = read.ReadBytes((int)info1.Length);
                     m = new mus(data);
                     if (m.readOK)
                     {
-                        CoBox1.Text = oF1.FileName;
+                        textMidiPath.Text = openMidiDialog.FileName;
                         panel2.Enabled = true;
                         panel3.Enabled = true;
                         panel4.Enabled = true;
@@ -121,7 +121,7 @@ namespace midi轉換器Csh
             int ot = 6;
             while (Panel1.Controls.Count > ot)
             { Panel1.Controls[ot].Dispose(); }
-            comboBox1.Items.Clear();
+            cbSource.Items.Clear();
         }
         void dat(mus m)
         {
@@ -132,7 +132,7 @@ namespace midi轉換器Csh
             var tis = (int)(ti % 60);
             var mmus = m.qx_x_timeoneCOPY2.SelectMany(x => x).SelectMany(x => x).Where(x => x != -1).Min();
             var Mmus = m.qx_x_timeoneCOPY2.SelectMany(x => x).SelectMany(x => x).Max();
-            much.Text =
+            lblInfo.Text =
                 $"BPM：{m.BPM}\r\n" +
                 $"時間：{tim}：{tis:0}\r\n" +
                 $"最低音：({mmus}){mukk[mmus]}\r\n" +
@@ -141,7 +141,7 @@ namespace midi轉換器Csh
             {
                 for (int j = 0; j < m.qx_x_timeoneCOPY2[i].Length; j++)
                 {
-                    comboBox1.Items.Add($"{i + 1}_{j + 1}");
+                    cbSource.Items.Add($"{i + 1}_{j + 1}");
                 }
             }
             coup();
@@ -150,30 +150,30 @@ namespace midi轉換器Csh
         {
             Array.Resize(ref coBo, coBo.Length + 1);
             coBo[coBo.Length - 1] = box;
-            for (int i = 0; i < comboBox1.Items.Count; i++)
+            for (int i = 0; i < cbSource.Items.Count; i++)
             {
-                box.Items.Add(comboBox1.Items[i]);
+                box.Items.Add(cbSource.Items[i]);
             }
             box.Text = box.Items[0].ToString();
         }
         void coup()
         {
-            comboBox2.Items.Clear();
-            comboBox3.Items.Clear();
-            for (int i = 0; i < comboBox1.Items.Count; i++)
+            cbTarget.Items.Clear();
+            cbSpk1.Items.Clear();
+            for (int i = 0; i < cbSource.Items.Count; i++)
             {
-                comboBox2.Items.Add(comboBox1.Items[i]);
-                comboBox3.Items.Add(comboBox1.Items[i]);
+                cbTarget.Items.Add(cbSource.Items[i]);
+                cbSpk1.Items.Add(cbSource.Items[i]);
             }
-            comboBox1.Text = comboBox1.Items[0].ToString();
-            comboBox2.Text = comboBox2.Items[0].ToString();
-            comboBox3.Text = comboBox3.Items[0].ToString();
+            cbSource.Text = cbSource.Items[0].ToString();
+            cbTarget.Text = cbTarget.Items[0].ToString();
+            cbSpk1.Text = cbSpk1.Items[0].ToString();
             foreach (var item in coBo)
             {
                 item.Items.Clear();
-                for (int i = 0; i < comboBox1.Items.Count; i++)
+                for (int i = 0; i < cbSource.Items.Count; i++)
                 {
-                    item.Items.Add(comboBox1.Items[i]);
+                    item.Items.Add(cbSource.Items[i]);
                 }
                 item.Text = item.Items[0].ToString();
             }
@@ -319,8 +319,8 @@ namespace midi轉換器Csh
                 }
             }
             GC.Collect();
-            num1.Value = 0;
-            num1.Maximum = bmp[0][0].Length - 1;
+            nudMinuteIndex.Value = 0;
+            nudMinuteIndex.Maximum = bmp[0][0].Length - 1;
             for (int i = 0; i < limg.Length; i++)
             {
                 for (int j = 0; j < limg[i].Length; j++)
@@ -333,22 +333,22 @@ namespace midi轉換器Csh
         #endregion
         #endregion
         #region 
-        private void button1_Click(object sender, EventArgs e)
+        private void btnPrevMinute_Click(object sender, EventArgs e)
         {
-            if (num1.Minimum < num1.Value) { num1.Value -= 1; }
+            if (nudMinuteIndex.Minimum < nudMinuteIndex.Value) { nudMinuteIndex.Value -= 1; }
         }
-        private void button2_Click(object sender, EventArgs e)
+        private void btnNextMinute_Click(object sender, EventArgs e)
         {
-            if (num1.Value < num1.Maximum) { num1.Value += 1; }
+            if (nudMinuteIndex.Value < nudMinuteIndex.Maximum) { nudMinuteIndex.Value += 1; }
         }
-        private void num1_ValueChanged(object sender, EventArgs e)
+        private void nudMinuteIndex_ValueChanged(object sender, EventArgs e)
         {
-            tla3.Text = $"時間軸：{num1.Value}分鐘~{num1.Value + 1}分鐘";
+            lblTimeIInfo.Text = $"時間軸：{nudMinuteIndex.Value}分鐘~{nudMinuteIndex.Value + 1}分鐘";
             for (int i = 0; i < limg.Length; i++)
             {
                 for (int j = 0; j < limg[i].Length; j++)
                 {
-                    limg[i][j][0].Image = bmp[i][j][(int)num1.Value];
+                    limg[i][j][0].Image = bmp[i][j][(int)nudMinuteIndex.Value];
                 }
             }
         }
@@ -371,29 +371,29 @@ namespace midi轉換器Csh
                 var to1 = Array.IndexOf(col, (int)to0);
                 string to2 = "";
                 if (to1 != -1) { to2 = mukk[to1]; }
-                sem2.Text =
+                lblCursorInfo.Text =
                     $"滑鼠所在位置\r\n" +
                     $"音軌：{ti + 1}_{tj + 1}\r\n" +
-                    $"時間：{num1.Value}：{tt}\r\n" +
+                    $"時間：{nudMinuteIndex.Value}：{tt}\r\n" +
                     $"音符：({to1}){to2}\r\n";
             }
             else
             {
-                sem2.Text = "滑鼠所在位置\r\n音軌：\r\n時間：\r\n音符：\r\n";
+                lblCursorInfo.Text = "滑鼠所在位置\r\n音軌：\r\n時間：\r\n音符：\r\n";
             }
         }
         private void lttt(object sender, EventArgs e)
         {
-            sem2.Text = "滑鼠所在位置\r\n音軌：\r\n時間：\r\n音符：\r\n";
+            lblCursorInfo.Text = "滑鼠所在位置\r\n音軌：\r\n時間：\r\n音符：\r\n";
         }
         #endregion
         #region 
-        private void button3_Click(object sender, EventArgs e)
+        private void btnMove_Click(object sender, EventArgs e)
         {
-            int ini = Convert.ToInt32(comboBox1.Text.Split('_')[0]) - 1;
-            int inj = Convert.ToInt32(comboBox1.Text.Split('_')[1]) - 1;
-            int oui = Convert.ToInt32(comboBox2.Text.Split('_')[0]) - 1;
-            int ouj = Convert.ToInt32(comboBox2.Text.Split('_')[1]) - 1;
+            int ini = Convert.ToInt32(cbSource.Text.Split('_')[0]) - 1;
+            int inj = Convert.ToInt32(cbSource.Text.Split('_')[1]) - 1;
+            int oui = Convert.ToInt32(cbTarget.Text.Split('_')[0]) - 1;
+            int ouj = Convert.ToInt32(cbTarget.Text.Split('_')[1]) - 1;
             for (int i = 0; i < m.Sec6rhythm.Length; i++)
             {
                 var a = m.qx_x_timeoneCOPY2[ini][inj][i];
@@ -408,8 +408,8 @@ namespace midi轉換器Csh
             }
             pcc(m, limg, ini, inj);
             pcc(m, limg, oui, ouj);
-            num1.Value = 0;
-            num1.Maximum = bmp[0][0].Length - 1;
+            nudMinuteIndex.Value = 0;
+            nudMinuteIndex.Maximum = bmp[0][0].Length - 1;
             for (int i = 0; i < limg.Length; i++)
             {
                 for (int j = 0; j < limg[i].Length; j++)
@@ -481,7 +481,7 @@ namespace midi轉換器Csh
         }
         #endregion
 
-        private void button4_Click(object sender, EventArgs e)
+        private void btnReset_Click(object sender, EventArgs e)
         {
             m.qx_x_timeoneCOPY2 = new int[m.qx_x_timeone.Length][][];
             for (int i = 0; i < m.qx_x_timeone.Length; i++)
@@ -500,7 +500,7 @@ namespace midi轉換器Csh
             penBP(m, limg);
         }
 
-        private void button8_Click(object sender, EventArgs e)
+        private void btnAddSpk_Click(object sender, EventArgs e)
         {
 
             var lab = new Label
@@ -510,7 +510,7 @@ namespace midi轉換器Csh
                 Font = new Font("Microsoft JhengHei UI", 12F),
                 Margin = new Padding(0),
                 TextAlign = ContentAlignment.MiddleCenter,
-                Text = $"喇叭{spkm.RowCount + 1}"
+                Text = $"喇叭{tblSpk.RowCount + 1}"
             };
             var boxx = new System.Windows.Forms.ComboBox();
             boxx.Dock = DockStyle.Fill;
@@ -518,43 +518,43 @@ namespace midi轉換器Csh
             boxx.Font = new Font("Microsoft JhengHei UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 136);
 
             coadd(ref boxx);
-            spkm.RowCount += 1;
-            spkm.RowStyles.Add(new RowStyle(SizeType.Absolute, 35F));
-            spkm.Controls.Add(lab, 0, spkm.RowCount - 1);
-            spkm.Controls.Add(boxx, 1, spkm.RowCount - 1);
+            tblSpk.RowCount += 1;
+            tblSpk.RowStyles.Add(new RowStyle(SizeType.Absolute, 35F));
+            tblSpk.Controls.Add(lab, 0, tblSpk.RowCount - 1);
+            tblSpk.Controls.Add(boxx, 1, tblSpk.RowCount - 1);
 
 
 
         }
 
-        private void button7_Click(object sender, EventArgs e)
+        private void btnRemoveSpk_Click(object sender, EventArgs e)
         {
-            if (spkm.RowCount > 1)
+            if (tblSpk.RowCount > 1)
             {
                 Array.Resize(ref coBo, coBo.Length - 1);
-                for (int i = 0; i < spkm.ColumnCount; i++)
+                for (int i = 0; i < tblSpk.ColumnCount; i++)
                 {
-                    spkm.GetControlFromPosition(i, spkm.RowCount - 1).Dispose();
+                    tblSpk.GetControlFromPosition(i, tblSpk.RowCount - 1).Dispose();
                 }
-                spkm.RowStyles.RemoveAt(spkm.ColumnCount - 1);
-                spkm.RowCount -= 1;
+                tblSpk.RowStyles.RemoveAt(tblSpk.ColumnCount - 1);
+                tblSpk.RowCount -= 1;
             }
         }
 
         private void button6_Click(object sender, EventArgs e)
         {
-            save2.InitialDirectory = Application.StartupPath;
-            if (save2.ShowDialog() == DialogResult.OK)
+            saveForPython.InitialDirectory = Application.StartupPath;
+            if (saveForPython.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    using (StreamWriter stram = new StreamWriter(save2.FileName))
+                    using (StreamWriter stram = new StreamWriter(saveForPython.FileName))
                     {
                         string outstr = "";
                         outstr += "BPM = " + m.BPM + ".0\r\n\r\n";
 
-                        var ii3 = Convert.ToInt32(comboBox3.Text.Split('_')[0]) - 1;
-                        var jj3 = Convert.ToInt32(comboBox3.Text.Split('_')[1]) - 1;
+                        var ii3 = Convert.ToInt32(cbSpk1.Text.Split('_')[0]) - 1;
+                        var jj3 = Convert.ToInt32(cbSpk1.Text.Split('_')[1]) - 1;
                         outstr += $"spk1=[";
                         for (int j = 0; j < m.qx_x_timeoneCOPY2[ii3][jj3].Length; j++)
                         {
@@ -606,20 +606,20 @@ namespace midi轉換器Csh
             }
         }
 
-        private void button5_Click(object sender, EventArgs e)
+        private void btnArduino_Click(object sender, EventArgs e)
         {
-            save.InitialDirectory = Application.StartupPath;
-            if (save.ShowDialog() == DialogResult.OK)
+            saveForArduino.InitialDirectory = Application.StartupPath;
+            if (saveForArduino.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    using (StreamWriter stram = new StreamWriter(save.FileName))
+                    using (StreamWriter stram = new StreamWriter(saveForArduino.FileName))
                     {
                         string outstr = "";
                         outstr += "double BPM = " + m.BPM + ".0;\r\n\r\n";
 
-                        var ii3 = Convert.ToInt32(comboBox3.Text.Split('_')[0]) - 1;
-                        var jj3 = Convert.ToInt32(comboBox3.Text.Split('_')[1]) - 1;
+                        var ii3 = Convert.ToInt32(cbSpk1.Text.Split('_')[0]) - 1;
+                        var jj3 = Convert.ToInt32(cbSpk1.Text.Split('_')[1]) - 1;
                         outstr += $"const static PROGMEM int spk1[]= {{";
                         for (int j = 0; j < m.qx_x_timeoneCOPY2[ii3][jj3].Length; j++)
                         {
